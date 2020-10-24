@@ -2,7 +2,6 @@
 
 open System
 
-
 let isIsogram (input: string) =
     match input with
     | "" -> true
