@@ -36,12 +36,14 @@ let validatedExchangeCode (input: string): Result<string, string> =
 let toNumber (input: string): Result<uint64, string> = Ok(UInt64.Parse input)
 
 let clean (input: string): Result<uint64, string> =
+    let (>>=) x fn = Result.bind fn x
+
     let cleaned =
         input
         |> validateForLettersAndPunctuations
-        |> Result.bind validateLength
-        |> Result.bind validatedAreaCode
-        |> Result.bind validatedExchangeCode
-        |> Result.bind toNumber
+        >>= validateLength
+        >>= validatedAreaCode
+        >>= validatedExchangeCode
+        >>= toNumber
 
     cleaned
