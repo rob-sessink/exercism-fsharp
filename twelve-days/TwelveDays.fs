@@ -39,17 +39,17 @@ let recite start stop =
 
     let listOfGifts day = appendGifts gifts.[0..day] ""
 
-    let rec reciteVerse verses verseList =
+    let verse day =
+        (sprintf "%s%s" (prefix day) (listOfGifts day))
+
+    let rec reciteVerse verses last verseList =
+        let day = last - 1
         match verses with
         | _ :: tail ->
-            let day = tail.Length
+            let newVerses = (verse day) :: verseList
 
-            let newVerses =
-                (sprintf "%s%s" (prefix day) (listOfGifts day))
-                :: verseList
-
-            reciteVerse tail newVerses
+            reciteVerse tail day newVerses
         | [] -> verseList
 
     let verses = [ start .. stop ]
-    reciteVerse verses []
+    reciteVerse verses stop []
