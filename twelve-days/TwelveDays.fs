@@ -29,11 +29,11 @@ let recite start stop =
           "eleven Pipers Piping"
           "twelve Drummers Drumming" ]
 
-    let rec appendGifts gifts present giftList =
+    let rec appendGifts gifts presents giftList =
         match gifts with
-        | head :: tail when present = 0 -> appendGifts tail (present + 1) (sprintf "%s%s." head giftList)
-        | head :: tail when present = 1 -> appendGifts tail (present + 1) (sprintf "%s, and %s" head giftList)
-        | head :: tail -> appendGifts tail (present + 1) (sprintf "%s, %s" head giftList)
+        | head :: tail when presents = 0 -> appendGifts tail (presents + 1) (sprintf "%s%s." head giftList)
+        | head :: tail when presents = 1 -> appendGifts tail (presents + 1) (sprintf "%s, and %s" head giftList)
+        | head :: tail -> appendGifts tail (presents + 1) (sprintf "%s, %s" head giftList)
         | [] -> giftList
 
     let prefix day =
@@ -41,17 +41,14 @@ let recite start stop =
 
     let listOfGifts day = appendGifts gifts.[0..day] 0 ""
 
-    let verse day =
+    let sentence day =
         (sprintf "%s%s" (prefix day) (listOfGifts day))
 
-    let rec reciteVerse verses last verseList =
-        let day = last - 1
+    let rec reciteVerse verses day sentences =
+        let day = day - 1
         match verses with
-        | _ :: tail ->
-            let newVerses = (verse day) :: verseList
-
-            reciteVerse tail day newVerses
-        | [] -> verseList
+        | _ :: tail -> reciteVerse tail day ((sentence day) :: sentences)
+        | [] -> sentences
 
     let verses = [ start .. stop ]
     reciteVerse verses stop []
