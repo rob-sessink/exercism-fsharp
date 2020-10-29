@@ -5,6 +5,10 @@
 //  true  | true  | false        | false
 //  true  | false | false        | true
 //  false | false | false        | false
+//
+// https://math.stackexchange.com/questions/2373178/simplifying-the-boolean-expression-for-leap-year
+// https://www.allaboutcircuits.com/technical-articles/boolean-basics/
+
 
 let leapYear (year: int): bool =
 
