@@ -1,14 +1,14 @@
 ﻿module BankAccount
 
-// based upon http://www.fssnip.net/nQ/title/Agent-demo
+// based upon
+// http://www.fssnip.net/nQ/title/Agent-demo
+// https://www.codemag.com/article/1707051/Writing-Concurrent-Programs-Using-F
 
 type Status =
     | Open
     | Closed
 
-type Account =
-    { mutable Balance: decimal
-      mutable Status: Status }
+type Account = { Balance: decimal; Status: Status }
 
 type AccountAction =
     | Open of decimal
@@ -18,44 +18,50 @@ type AccountAction =
 
 type BankAccount() =
 
-    let init =
+    let initialize =
         { Balance = 0.0m
           Status = Status.Closed }
-    
+
     let updateBalance change account =
         match account.Status with
-        | Status.Open -> account.Balance <- account.Balance + change
-        | Status.Closed -> ()
+        | Status.Open ->
+            { account with
+                  Balance = account.Balance + change }
+        | Status.Closed -> account
 
-    let openAccount amount account =
-        account.Balance <- amount
-        account.Status <- Status.Open
+    let openAccount amount =
+        { Balance = amount
+          Status = Status.Open }
+
 
     let getBalance account =
         match account.Status with
         | Status.Open -> Some account.Balance
         | Status.Closed -> None
 
-    let closeAccount account = account.Status <- Status.Closed
+    let closeAccount account = { account with Status = Status.Closed }
 
     let agent =
-        MailboxProcessor.Start(fun inbox ->
+        MailboxProcessor<AccountAction>
+            .Start(fun inbox ->
 
-            let rec loop current =
-                async {
-                    let! msg = inbox.Receive()
+                  let rec loop current =
+                      async {
+                          let! msg = inbox.Receive()
 
-                    match msg with
-                    | Open amount -> current |> openAccount amount
-                    | Update amount -> current |> updateBalance amount
-                    | GetBalance repl -> repl.Reply(getBalance current)
-                    | Close -> closeAccount current
+                          let balance =
+                              match msg with
+                              | Open amount -> openAccount amount
+                              | Update amount -> updateBalance amount current
+                              | GetBalance repl ->
+                                  repl.Reply(getBalance current)
+                                  current
+                              | Close -> closeAccount current
 
-                    printfn "Received msg: "
-                    return! loop current
-                }
+                          return! loop balance
+                      }
 
-            loop init)
+                  loop initialize)
 
     member this.Open =
         agent.Post(AccountAction.Open 0.0m)
@@ -71,7 +77,6 @@ type BankAccount() =
     member this.Close =
         agent.Post(AccountAction.Close)
         this
-
 
 let mkBankAccount () = BankAccount()
 
