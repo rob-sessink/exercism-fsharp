@@ -9,4 +9,4 @@ let personalBest (values: int list): int = values |> List.max
 let personalTopThree (values: int list): int list =
     values
     |> List.sortDescending
-    |> List.take (min values.Length 3)
+    |> List.truncate 3
