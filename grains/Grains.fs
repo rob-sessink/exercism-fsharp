@@ -10,8 +10,7 @@ let toUInt64 n = Ok(uint64 n)
 
 let square (n: int): Result<uint64, string> =
     match n with
-    | n when (n < 0 || n > 64) -> Error "square must be between 1 and 64"
-    | 0 -> Error "square must be between 1 and 64"
+    | n when (n <= 0 || n > 64) -> Error "square must be between 1 and 64"
     | n -> toUInt64 (squared bigint.One n)
 
 let total: Result<uint64, string> =
