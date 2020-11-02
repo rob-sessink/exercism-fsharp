@@ -9,7 +9,6 @@ let inline multiply list =
 
 let inline onlyDigits s = s |> Seq.forall Char.IsDigit
 
-
 let largestProduct (input: string) seriesLength: int option =
     match input, seriesLength with
     | i, sl when i.Length < sl -> None
