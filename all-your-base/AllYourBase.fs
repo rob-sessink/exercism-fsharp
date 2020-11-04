@@ -19,7 +19,7 @@ let rebase digits inputBase outputBase =
 
         match (division, remainder) with
         | 0, x -> (x :: acc)
-        | _, x -> baseConversion outputBase (x :: acc) division
+        | _, x -> toBase outputBase (x :: acc) division
 
     // validate input parameters
     match digits, inputBase, outputBase with
