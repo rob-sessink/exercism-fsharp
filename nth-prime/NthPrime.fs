@@ -10,7 +10,6 @@ let prime (nth: int): int option =
     // https://stackoverflow.com/questions/33519963/finding-nth-prime-using-seive-of-eratosthens
     let upperbound nth =
         match nth with
-        | 0 -> 1
         | 1 -> 2
         | 2 -> 5
         | 3 -> 6
