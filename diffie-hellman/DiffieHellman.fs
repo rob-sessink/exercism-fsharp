@@ -3,7 +3,7 @@
 open System
 open System.Numerics
 
-let privateKey primeP =
+let privateKey (primeP:bigint) =
     let rnd = Random()
 
     let number =
