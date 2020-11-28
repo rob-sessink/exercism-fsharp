@@ -57,7 +57,6 @@ let up (location: Location) =
     | Left (parentPath, parentValue, rightSiblings) ->
         Location(BTree(parentValue, Some tree, rightSiblings), parentPath)
         |> Some
-
     | Right (parentPath, parentValue, leftSiblings) ->
         Location(BTree(parentValue, leftSiblings, Some tree), parentPath)
         |> Some
