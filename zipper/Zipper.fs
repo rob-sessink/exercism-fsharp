@@ -11,8 +11,6 @@
 
 type BTree = BTree of value: int * left: BTree option * right: BTree option
 
-let tree value left right = BTree(value, left, right)
-
 type Path =
     | Top
     | Left of parentPath: Path * parentValue: int * rightSiblings: BTree option
@@ -20,8 +18,16 @@ type Path =
 
 type Location = Location of focus: BTree * path: Path
 
+/// <summary>Construct a tree</summary>
+/// <returns>tree</returns>
+let tree value left right = BTree(value, left, right)
+
+/// <summary>Get Location from Tree</summary>
+/// <returns>Location</returns>
 let fromTree (tree: BTree) = Location(tree, Top)
 
+/// <summary>Derive Tree from Location</summary>
+/// <returns>Tree</returns>
 let toTree (location: Location): BTree =
     let rec upTree path (tree: BTree) =
         match path with
@@ -34,22 +40,30 @@ let toTree (location: Location): BTree =
     let (Location (tree, path)) = location
     upTree path tree
 
+/// <summary>Traverse to left node</summary>
+/// <returns>left location or None</returns>
 let left (location: Location) =
     let (Location (BTree (value, left, right), path)) = location
     match left with
     | Some l -> Location(l, Left(path, value, right)) |> Some
     | None -> None
 
+/// <summary>Traverse to right node</summary>
+/// <returns>right location or None</returns>
 let right (location: Location) =
     let (Location (BTree (value, left, right), path)) = location
     match right with
     | Some r -> Location(r, Right(path, value, left)) |> Some
     | None -> None
 
+/// <summary>Get value of current node</summary>
+/// <returns>value</returns>
 let value (location: Location) =
     let (Location (BTree (value, left, right), path)) = location
     value
 
+/// <summary>Traverse up in the tree</summary>
+/// <returns>parent or None if Top location</returns>
 let up (location: Location) =
     let (Location (tree, path)) = location
     match path with
@@ -61,14 +75,36 @@ let up (location: Location) =
         Location(BTree(parentValue, leftSiblings, Some tree), parentPath)
         |> Some
 
+/// <summary>Delete current and child nodes and traverse up</summary>
+/// <returns>parent location</returns>
+let delete (location: Location) =
+    let (Location (_, path)) = location
+    match path with
+    | Top -> None
+    | Left (parentPath, parentValue, rightSiblings) ->
+        Location(BTree(parentValue, None, rightSiblings), parentPath)
+        |> Some
+    | Right (parentPath, parentValue, leftSiblings) ->
+        Location(BTree(parentValue, leftSiblings, None), parentPath)
+        |> Some
+
+/// <summary>Set value of current node</summary>
+/// <param name="value">to set</param>
+/// <returns>current location</returns>
 let setValue value (location: Location) =
     let (Location (BTree (current, left, right), path)) = location
     (Location(BTree(value, left, right), path))
 
+/// <summary>Set left subtree of current node</summary>
+/// <param name="subtree">to set</param>
+/// <returns>current location</returns>
 let setLeft subtree (location: Location) =
     let (Location (BTree (value, left, right), path)) = location
     Location(BTree(value, subtree, right), path)
 
+/// <summary>Set right subtree of current node</summary>
+/// <param name="subtree">to set</param>
+/// <returns>current location</returns>
 let setRight subtree (location: Location) =
     let (Location (BTree (value, left, right), path)) = location
     Location(BTree(value, left, subtree), path)

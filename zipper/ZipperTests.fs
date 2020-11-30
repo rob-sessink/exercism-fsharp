@@ -46,6 +46,13 @@ let ``Traversing up from top`` () =
     sut |> should equal expected
 
 [<Fact>]
+let ``Left from top`` () =
+    let zipper = fromTree (tree 1 None None)
+    let sut = zipper |> left
+    let expected = None
+    sut |> should equal expected
+
+[<Fact>]
 let ``Left, right, and up`` () =
     let zipper = fromTree (tree 1 (subTree 2 None (leaf 3)) (leaf 4))
     let sut = zipper |> left |> Option.get |> up |> Option.get |> right |> Option.get |> up |> Option.get |> left |> Option.get |> right |> Option.get |> value
@@ -101,5 +108,23 @@ let ``Different paths to same zipper`` () =
     let expected = fromTree (tree 1 (subTree 2 None (leaf 3)) (leaf 4)) |> right
     sut |> should equal expected
 
+[<Fact>]
+let ``Delete intermediate subtree`` () =
+    let zipper = fromTree (tree 1 (subTree 2 None (leaf 3)) (leaf 4))
+    let sut = zipper |> left |> Option.get |> delete |> Option.get |> toTree
+    let expected = tree 1 None (leaf 4)
+    sut |> should equal expected
+    
+[<Fact>]
+let ``Delete leaf`` () =
+    let zipper = fromTree (tree 1 (subTree 2 None (leaf 3)) (leaf 4))
+    let sut = zipper |> right |> Option.get |> delete |> Option.get |> toTree
+    let expected = tree 1 (subTree 2 None (leaf 3)) None
+    sut |> should equal expected
 
-
+[<Fact>]
+let ``Delete Top`` () =
+    let zipper = fromTree (tree 1 (subTree 2 None (leaf 3)) (leaf 4))
+    let sut = zipper |> left |> Option.get |> up |> Option.get |> delete
+    let expected = None
+    sut |> should equal expected
