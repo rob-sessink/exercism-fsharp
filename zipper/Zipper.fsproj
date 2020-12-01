@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="Zipper.fs" />
     <Compile Include="ZipperTests.fs" />
+    <Content Include="LINKS.md" />
   </ItemGroup>
 
   <ItemGroup>
