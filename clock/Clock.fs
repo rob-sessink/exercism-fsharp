@@ -10,17 +10,14 @@ let create hours minutes =
         | x when x < 0 -> -1 // within a negative hour
         | x -> x / 60
 
-    let hours =
-        match hours + additionalHours with
-        | x when x < 0 && (x % 24) = 0 -> 0 // negative on midnight
-        | x when x < 0 -> x % 24 + 24 // negative not on midnight
-        | x -> x % 24
+    let modulo divisor number =
+        match number with
+        | x when x < 0 && (x % divisor) = 0 -> 0 // negative exact on divisor (midnight or hour)
+        | x when x < 0 -> x % divisor + divisor // negative not on divisor (midnight or hour)
+        | x -> x % divisor
 
-    let minutesRemaining =
-        match minutes with
-        | x when x < 0 && (x % 60) = 0 -> 0 // negative on the hour
-        | x when x < 0 -> x % 60 + 60 // negative not on the hour
-        | x -> x % 60
+    let hours = modulo 24 (hours + additionalHours)
+    let minutesRemaining = modulo 60 minutes
 
     Clock(hours, minutesRemaining)
 
