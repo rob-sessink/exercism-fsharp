@@ -12,7 +12,7 @@ let nucleotideCounts (strand: string): Option<Map<char, int>> =
 
     let count strand =
         strand
-        |> Seq.countBy (fun nu -> nu)
+        |> Seq.countBy id
         |> Seq.fold (fun (map: Map<char, int>) t -> map.Add(fst t, snd t)) zeroed
 
     match valid strand with
