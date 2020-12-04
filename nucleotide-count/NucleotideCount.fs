@@ -5,7 +5,7 @@ let nucleotideCounts (strand: string): Option<Map<char, int>> =
     let nucleotides = seq [ 'A'; 'C'; 'G'; 'T' ]
 
     let zeroed =
-        Seq.fold (fun (map: Map<char, int>) t -> map.Add(t, 0)) Map.empty nucleotides
+        Seq.map (fun nu -> (nu, 0)) nucleotides |> Map
 
     let valid strand =
         Seq.forall (fun nu -> (Seq.contains nu nucleotides)) strand
