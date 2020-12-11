@@ -9,16 +9,20 @@ type LinkedList =
     { mutable head: Node option
       mutable tail: Node option }
 
-let mkLinkedList () = { head = None; tail = None }
+let mkLinkedList() =
+    { head = None
+      tail = None }
+
+let buildNode newValue previous next =
+    Some
+        { value = newValue
+          previous = previous
+          next = next }
 
 let addToEmpty newValue linkedList =
-    let node =
-        { value = newValue
-          previous = None
-          next = None }
-
-    linkedList.head <- Some node
-    linkedList.tail <- Some node
+    let node = buildNode newValue None None
+    linkedList.head <- node
+    linkedList.tail <- node
 
 let pop linkedList =
     match linkedList.tail with
@@ -43,12 +47,7 @@ let shift linkedList =
 let push newValue linkedList =
     match linkedList.tail with
     | Some tail ->
-        let node =
-            Some
-                { value = newValue
-                  previous = Some tail
-                  next = None }
-
+        let node = buildNode newValue (Some tail) None
         tail.next <- node
         linkedList.tail <- node
     | None -> addToEmpty newValue linkedList
@@ -56,12 +55,7 @@ let push newValue linkedList =
 let unshift newValue linkedList =
     match linkedList.head with
     | Some head ->
-        let node =
-            Some
-                { value = newValue
-                  previous = None
-                  next = Some head }
-
+        let node = buildNode newValue None (Some head)
         head.previous <- node
         linkedList.head <- node
     | None -> addToEmpty newValue linkedList
