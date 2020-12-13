@@ -14,16 +14,13 @@ let greatest array = elements List.sortDescending array
 
 let smallest array = elements List.sort array
 
-let smallestForColumn (matrix: int [,]) colIndex = matrix.[*, colIndex] |> smallest
+let smallestInColumn (matrix: int [,]) colIndex = matrix.[*, colIndex] |> smallest
 
-let filterByIndex row entries = entries |> List.filter (fun c -> fst c = row)
+let filterByIndex index entries =
+    entries |> List.filter (fun c -> fst c = index)
 
-let isSaddle rowPosition colPosition =
-    if (snd rowPosition) = (snd colPosition)
-    then Some(fst colPosition + 1, fst rowPosition + 1)
-    else None
-
-let chooseSaddles row columns = List.choose (fun column -> isSaddle row column) columns
+let createSaddle rowPosition colPosition =
+    (fst colPosition + 1, fst rowPosition + 1)
 
 let findSaddlePoints matrix =
     seq {
@@ -31,9 +28,9 @@ let findSaddlePoints matrix =
             yield! matrix.[row, *]
                    |> greatest
                    |> List.map (fun rowPosition ->
-                       smallestForColumn matrix (fst rowPosition)
+                       smallestInColumn matrix (fst rowPosition)
                        |> filterByIndex row
-                       |> chooseSaddles rowPosition)
+                       |> List.map (createSaddle rowPosition))
                    |> List.concat
     }
     |> Seq.toList
