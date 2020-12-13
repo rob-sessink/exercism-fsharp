@@ -1,18 +1,13 @@
 module SaddlePoints
 
-let greatest array =
+let getElements minOrMax array =
     array
     |> List.ofArray
     |> List.indexed
-    |> List.choose (fun e -> if (snd e) = (Array.max array) then Some e else None)
+    |> List.choose (fun e -> if (snd e) = (minOrMax array) then Some e else None)
 
-let smallest array =
-    array
-    |> List.ofArray
-    |> List.indexed
-    |> List.choose (fun e -> if (snd e) = (Array.min array) then Some e else None)
-
-let smallestInColumn (matrix: int [,]) colIndex = matrix.[*, colIndex] |> smallest
+let smallestInColumn (matrix: int [,]) colIndex =
+    matrix.[*, colIndex] |> getElements Array.min
 
 let filterByIndex index entries =
     entries |> List.filter (fun c -> fst c = index)
@@ -25,7 +20,7 @@ let saddlePoints (matrix: int list list) =
     seq {
         for row in 0 .. (Array2D.length1 a2d) - 1 do
             yield! a2d.[row, *]
-                   |> greatest
+                   |> getElements Array.max
                    |> List.map (fun rowPosition ->
                        smallestInColumn a2d (fst rowPosition)
                        |> filterByIndex row
