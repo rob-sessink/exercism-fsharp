@@ -4,7 +4,7 @@ let getElements minOrMax array =
     array
     |> List.ofArray
     |> List.indexed
-    |> List.choose (fun e -> if (snd e) = (minOrMax array) then Some e else None)
+    |> List.filter (fun e -> (snd e) = (minOrMax array))
 
 let smallestInColumn (matrix: int [,]) colIndex =
     matrix.[*, colIndex] |> getElements Array.min
