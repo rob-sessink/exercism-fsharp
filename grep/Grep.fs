@@ -1,9 +1,10 @@
-﻿module Grep
+module Grep
 
 open System.IO
 open System.Text.RegularExpressions
 
 type File = File of file: string * lines: string list
+
 type MatchedLine = MatchedLine of lineNumber: int * line: string * fileName: string
 
 let hasFlag flag flagArguments = Seq.contains flag flagArguments
@@ -22,10 +23,10 @@ let matches flags pattern lineIdx =
     Regex.Match((snd lineIdx), regex).Success
     <> inverted
 
-let multiFiles flags files =
+let formatMultiple flags files =
     List.length files > 1 && not (hasFlag "-l" flags)
 
-let output flags files matchedLine =
+let format flags files matchedLine =
     let (MatchedLine (lineNumber, line, fileName)) = matchedLine
 
     let formatted =
@@ -34,17 +35,17 @@ let output flags files matchedLine =
         | f when hasFlag "-n" f -> sprintf "%i:%s" (lineNumber + 1) line
         | _ -> sprintf "%s" line
 
-    match multiFiles flags files with
+    match formatMultiple flags files with
     | false -> formatted
     | true -> sprintf "%s:%s" fileName formatted
 
 let openFile file =
-    (file, File.ReadAllLines(file) |> Seq.toList)
+    (file, File.ReadAllLines(file) |> List.ofArray)
 
-let grep' flagArguments pattern file =
+let grep' flags pattern file =
     snd file
     |> List.indexed
-    |> List.filter (matches flagArguments pattern)
+    |> List.filter (matches flags pattern)
     |> List.map (fun lineIdx -> MatchedLine(fst lineIdx, snd lineIdx, fst file))
 
 let grep files flagArguments pattern =
@@ -52,5 +53,5 @@ let grep files flagArguments pattern =
     |> List.map openFile
     |> List.map (grep' flagArguments pattern)
     |> List.concat
-    |> List.map (output flagArguments files)
+    |> List.map (format flagArguments files)
     |> List.distinct
