@@ -31,7 +31,7 @@ let output flags files matchedLine =
     let formatted =
         match flags with
         | f when hasFlag "-l" f -> sprintf "%s" fileName
-        | f when hasFlag "-n" f -> sprintf "%i:%s" lineNumber line
+        | f when hasFlag "-n" f -> sprintf "%i:%s" (lineNumber + 1) line
         | _ -> sprintf "%s" line
 
     match multiFiles flags files with
@@ -45,7 +45,7 @@ let grep' flagArguments pattern file =
     snd file
     |> List.indexed
     |> List.filter (matches flagArguments pattern)
-    |> List.map (fun lineIdx -> MatchedLine(fst lineIdx + 1, snd lineIdx, fst file))
+    |> List.map (fun lineIdx -> MatchedLine(fst lineIdx, snd lineIdx, fst file))
 
 let grep files flagArguments pattern =
     files
