@@ -4,14 +4,9 @@ let transpose (input: string list) =
 
     let transpose' (input: string list) =
         let maxLen =
-            input
-            |> List.maxBy (fun s -> s.Length)
-            |> String.length
+            (input |> List.maxBy String.length |> String.length)
+            - 1
 
-        // A Z#        ADE.      .EDA
-        // D           ..FJ      FJ..
-        // EFGH        Z.G#      #G.Z
-        //  J#         #.H.      .H.#
         let fill cnt (eIdx: int * string) =
             match (cnt, snd eIdx) with
             | (cnt, e) when cnt < e.Length -> Some(e |> Seq.item cnt |> string)
@@ -29,15 +24,13 @@ let transpose (input: string list) =
         let padLeft elements =
             elements |> List.map (Option.defaultValue " ")
 
-        seq {
-            for row in 0 .. maxLen - 1 do
-                yield! [ input
-                         |> transpose row
-                         |> trimRight
-                         |> padLeft
-                         |> List.reduce (+) ]
-        }
-        |> Seq.toList
+        [ 0 .. maxLen ]
+        |> List.map (fun cnt ->
+            input
+            |> transpose cnt
+            |> trimRight
+            |> padLeft
+            |> List.reduce (+))
 
     match input with
     | [] -> []
