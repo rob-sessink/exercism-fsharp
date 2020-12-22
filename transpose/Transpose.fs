@@ -17,6 +17,9 @@ let transpose (input: string list) =
             | (cnt, e) when cnt < e.Length -> Some(e |> Seq.item cnt |> string)
             | _ -> None
 
+        let transpose row elements =
+            elements |> List.indexed |> List.map (fill row)
+
         let trimRight elements =
             elements
             |> List.rev
@@ -27,10 +30,9 @@ let transpose (input: string list) =
             elements |> List.map (Option.defaultValue " ")
 
         seq {
-            for cnt in 0 .. maxLen - 1 do
+            for row in 0 .. maxLen - 1 do
                 yield! [ input
-                         |> List.indexed
-                         |> List.map (fill cnt)
+                         |> transpose row
                          |> trimRight
                          |> padLeft
                          |> List.reduce (+) ]
