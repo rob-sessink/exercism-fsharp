@@ -1,4 +1,4 @@
-﻿module Transpose
+module Transpose
 
 let transpose (input: string list) =
 
@@ -12,13 +12,13 @@ let transpose (input: string list) =
             | (cnt, e) when cnt < e.Length -> Some(e |> Seq.item cnt |> string)
             | _ -> None
 
-        let transpose row elements =
-            elements |> List.indexed |> List.map (fill row)
+        let transpose cnt elements =
+            elements |> List.indexed |> List.map (fill cnt)
 
         let trimRight elements =
             elements
             |> List.rev
-            |> List.skipWhile (fun e -> e = None)
+            |> List.skipWhile Option.isNone
             |> List.rev
 
         let padLeft elements =
