@@ -153,7 +153,7 @@ let ``Iterate over buffer, invoking func`` () =
     let buffer1 = mkCircularBuffer 3
     let buffer2 = write 1 buffer1
     let buffer3 = write 2 buffer2
-    iter (fun e -> printfn "%i" e) buffer3
+    iter (fun e -> printfn "%i" e |> ignore) buffer3
 
 [<Fact>]
 let ``Peeking an empty buffer is not possible`` () =
@@ -197,4 +197,12 @@ let ``length of overwritten buffer is size`` () =
     let length = length buffer4
     length |> should equal 2
     
+[<Fact>]
+let ``length of buffer with write and read`` () =
+    let buffer1 = mkCircularBuffer 2
+    let buffer2 = write 1 buffer1
+    let buffer3 = write 2 buffer2
+    let (_, buffer4) = read buffer3
+    let length = length buffer4
+    length |> should equal 1
     

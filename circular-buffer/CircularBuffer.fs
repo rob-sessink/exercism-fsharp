@@ -2,78 +2,100 @@ module CircularBuffer
 
 open System
 
-type CircularBuffer<'a> = CircularBuffer of head: int * tail: int * full: bool * size: int * entries: 'a []
+type CircularBuffer<'a> =
+    { Head: int
+      Tail: int
+      Capacity: int
+      Size: int
+      Entries: 'a array }
 
-let increment pointer size = (pointer + 1) % size
+    static member create<'a> size =
+        { Head = 0
+          Tail = 0
+          Capacity = size
+          Size = size
+          Entries = Array.zeroCreate<'a> size }
 
-let decrement pointer size = (pointer + size - 1) % size
+    member this.clear() = CircularBuffer.create<'a> this.Size
 
-let isEmpty buffer =
-    let (CircularBuffer(head, tail, full, _, _)) = buffer
-    head = tail && full = false
+    member this.inc pointer = (pointer + 1) % this.Size
 
-let mkCircularBuffer size = CircularBuffer(0, 0, false, size, Array.zeroCreate size)
+    member this.incHead() = this.inc this.Head
 
-let clear buffer =
-    let (CircularBuffer(_, _, _, size, _)) = buffer
-    mkCircularBuffer size
+    member this.incTail() = this.inc this.Tail
 
-let write value buffer =
-    let (CircularBuffer(head, tail, full, size, entries)) = buffer
-    match full with
-    | true -> raise (Exception("Buffer is full"))
-    | false ->
-        let incTail = increment tail size
-        let isFull = (incTail = head)
-        Array.set entries (tail) value
-        (CircularBuffer(head, incTail, isFull, size, entries))
+    member this.dec pointer = (pointer + this.Size - 1) % this.Size
 
-let forceWrite value buffer =
-    let (CircularBuffer(head, tail, full, size, entries)) = buffer
-    match full with
-    | false -> write value buffer
-    | true ->
-        let incHead = increment head size
-        let incTail = increment tail size
-        Array.set entries (head) value
-        (CircularBuffer(incHead, incTail, full, size, entries))
+    member this.isEmpty = this.Head = this.Tail && this.Capacity = this.Size
 
-let read buffer =
-    let (CircularBuffer(head, tail, _, size, entries)) = buffer
-    match isEmpty buffer with
-    | true -> raise (Exception("Buffer is empty"))
-    | false ->
-        let incHead = increment head size
-        let data = entries.[head]
-        (data, (CircularBuffer(incHead, tail, false, size, entries)))
+    member this.isFull = this.Capacity = 0
 
-let iter func buffer =
-    let (CircularBuffer(head, _, _, _, _)) = buffer
-    match isEmpty buffer with
-    | true -> raise (Exception("Buffer is empty"))
-    | false ->
-        let rec iter cnt func buffer =
-            let (CircularBuffer(_, tail, _, size, entries)) = buffer
-            if cnt <> tail then
-                func entries.[cnt]
-                iter (increment cnt size) func buffer
+    member this.notEmpty func =
+        match this.isEmpty with
+        | true -> raise (Exception("Buffer is empty"))
+        | false -> func
 
-        iter head func buffer
+    member this.write value =
+        match this.isFull with
+        | true -> raise (Exception("Buffer is full"))
+        | false ->
+            Array.set this.Entries (this.Tail) value
+            { this with
+                  Tail = this.incTail()
+                  Capacity = this.Capacity - 1 }
 
-let peek buffer =
-    let (CircularBuffer(head, _, _, _, entries)) = buffer
-    match isEmpty buffer with
-    | true -> raise (Exception("Buffer is empty"))
-    | false -> entries.[head]
+    member this.forceWrite value =
+        match this.isFull with
+        | false -> this.write value
+        | true ->
+            Array.set this.Entries (this.Head) value
+            { this with
+                  Head = this.incHead()
+                  Tail = this.incTail() }
 
-let length buffer =
-    let (CircularBuffer(head, tail, full, size, _)) = buffer
-    match isEmpty buffer with
-    | true -> raise (Exception("Buffer is empty"))
-    | false ->
-        match buffer with
-        | _ when full -> size
-        | _ when tail > head -> tail - head
-        | _ ->
-            let count = size - head
-            if tail > 0 then count + tail - 1 else count
+    member this.read() =
+        match this.isEmpty with
+        | true -> raise (Exception("Buffer is empty"))
+        | false ->
+            let data = this.Entries.[this.Head]
+            (data,
+             { this with
+                   Head = this.incHead()
+                   Capacity = this.Capacity + 1 })
+
+    member this.iter func =
+        match this.isEmpty with
+        | true -> raise (Exception("Buffer is empty"))
+        | false ->
+            let rec iter cnt func =
+                if cnt <> this.Tail then
+                    func this.Entries.[cnt]
+                    iter (this.inc cnt) func
+
+            iter this.Head func
+
+    member this.peek() =
+        match this.isEmpty with
+        | true -> raise (Exception("Buffer is empty"))
+        | false -> this.Entries.[this.Head]
+
+    member this.length() =
+        match this.isEmpty with
+        | true -> raise (Exception("Buffer is empty"))
+        | false -> this.Size - this.Capacity
+
+let mkCircularBuffer size = CircularBuffer.create<int> size
+
+let clear (buffer: CircularBuffer<int>) = buffer.clear()
+
+let write value (buffer: CircularBuffer<int>) = buffer.write value
+
+let forceWrite value (buffer: CircularBuffer<int>) = buffer.forceWrite value
+
+let read (buffer: CircularBuffer<int>) = buffer.read()
+
+let iter func (buffer: CircularBuffer<int>) = buffer.iter func
+
+let peek (buffer: CircularBuffer<int>) = buffer.peek()
+
+let length (buffer: CircularBuffer<int>) = buffer.length()
