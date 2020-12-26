@@ -30,11 +30,6 @@ type CircularBuffer<'a> =
 
     member this.isFull = this.Capacity = 0
 
-    member this.notEmpty func =
-        match this.isEmpty with
-        | true -> raise (Exception("Buffer is empty"))
-        | false -> func
-
     member this.write value =
         match this.isFull with
         | true -> raise (Exception("Buffer is full"))
