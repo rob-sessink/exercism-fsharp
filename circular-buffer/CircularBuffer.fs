@@ -18,17 +18,17 @@ type CircularBuffer<'a> =
 
     member this.clear() = CircularBuffer.create<'a> this.Size
 
-    member this.inc pointer = (pointer + 1) % this.Size
+    member private this.inc pointer = (pointer + 1) % this.Size
 
-    member this.incHead() = this.inc this.Head
+    member private this.incHead() = this.inc this.Head
 
-    member this.incTail() = this.inc this.Tail
+    member private this.incTail() = this.inc this.Tail
 
-    member this.dec pointer = (pointer + this.Size - 1) % this.Size
+    member private this.dec pointer = (pointer + this.Size - 1) % this.Size
 
-    member this.isEmpty = this.Head = this.Tail && this.Capacity = this.Size
+    member private this.isEmpty = this.Head = this.Tail && this.Capacity = this.Size
 
-    member this.isFull = this.Capacity = 0
+    member private this.isFull = this.Capacity = 0
 
     member this.write value =
         match this.isFull with
