@@ -3,12 +3,12 @@ module AtbashCipher
 open System
 
 // composed functions
-let alphaToNumber (letter: char) = int letter - int 'a' + 1
-let numberToAtbash (number: int) = int 'z' - number + 1 |> char
+let alphaToNumber (letter: char) = int letter - int 'a'
+let numberToAtbash (number: int) = int 'z' - number |> char
 let alphaToAtbash = alphaToNumber >> numberToAtbash
 
-let atbashToNumber (atbash: char) = int 'z' - int atbash + 1
-let numberToAlpha (number: int) = int 'a' + number - 1 |> char
+let atbashToNumber (atbash: char) = int 'z' - int atbash
+let numberToAlpha (number: int) = int 'a' + number |> char
 let atbashToAlpha = atbashToNumber >> numberToAlpha
 
 // compacted functions
