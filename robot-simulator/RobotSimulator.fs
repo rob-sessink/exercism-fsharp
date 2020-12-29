@@ -26,16 +26,16 @@ let move instructions robot =
 
     let turn movement robot =
         let turned =
-            match movement with
-            | Left when robot.direction = North -> West
-            | Left when robot.direction = West -> South
-            | Left when robot.direction = South -> East
-            | Left when robot.direction = East -> North
-            | Right when robot.direction = North -> East
-            | Right when robot.direction = East -> South
-            | Right when robot.direction = South -> West
-            | Right when robot.direction = West -> North
-            | _ -> robot.direction
+            match robot.direction, movement with
+            | North, Left -> West
+            | West, Left -> South
+            | South, Left -> East
+            | East, Left -> North
+            | North, Right -> East
+            | East, Right -> South
+            | South, Right -> West
+            | West, Right -> North
+            | direction, _ -> direction
 
         { robot with direction = turned }
 
