@@ -24,7 +24,7 @@ let create direction position =
 
 let move instructions robot =
 
-    let turn movement robot =
+    let turn robot movement =
         let turned =
             match robot.direction, movement with
             | North, Left -> West
@@ -51,6 +51,8 @@ let move instructions robot =
 
         { robot with position = advanced }
 
+    let hold robot = robot
+
     let asMovement letter =
         match letter with
         | 'L' -> Left
@@ -60,9 +62,9 @@ let move instructions robot =
 
     let move robot instruction =
         match asMovement instruction with
-        | Left -> turn Left robot
-        | Right -> turn Right robot
+        | Left -> turn robot Left 
+        | Right -> turn robot Right
         | Advance -> advance robot
-        | Hold -> robot
+        | Hold -> hold robot
 
     instructions |> Seq.fold move robot
