@@ -5,16 +5,14 @@ open System
 let frequency (texts: string list) =
 
     let byLetter (texts: string list) letter =
-        let total = texts |> String.Concat
+        let combined = texts |> String.Concat
 
         let occurence =
-            total.ToLower()
+            combined.ToLower()
             |> Seq.filter (fun l -> l = letter)
             |> Seq.length
 
-        match occurence with
-        | 0 -> None
-        | _ -> Some(letter, occurence)
+        (letter, occurence)
 
     let uniqueLetters (texts: string list) =
         texts
@@ -30,8 +28,7 @@ let frequency (texts: string list) =
 
     let asDistributionMap frequencies =
         frequencies
-        |> Seq.filter Option.isSome
-        |> Seq.map Option.get
+        |> Seq.filter (fun freq -> snd freq <> 0)
         |> Map
 
     texts
