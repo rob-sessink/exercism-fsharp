@@ -15,9 +15,9 @@ let frequency (texts: string list) =
         (letter, occurence)
 
     let uniqueLetters (texts: string list) =
-        texts
-        |> Seq.map (fun s -> s.ToLower())
-        |> String.Concat
+        let combined = texts |> String.Concat
+
+        combined.ToLower()
         |> Seq.filter Char.IsLetter
         |> Seq.distinct
 
