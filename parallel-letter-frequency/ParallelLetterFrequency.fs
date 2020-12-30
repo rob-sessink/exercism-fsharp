@@ -2,9 +2,9 @@ module ParallelLetterFrequency
 
 open System
 
-// Solution by counting letter frequencies for the combined texts in parallel task: per unique letter.
+// Solution by counting letter frequencies for the combined texts in a task per unique letter.
 // For the texts used in the unit test this solution seems a bit slower, however expectation is when
-// number of E(unique letters) < E(number of texts) this is faster
+// E(unique letters) < E(number of texts) this is faster
 let frequency (texts: string list) =
 
     let byLetter (texts: string list) letter =
@@ -35,7 +35,7 @@ let frequency (texts: string list) =
     |> Async.RunSynchronously
     |> Map
 
-// Solution by counting letter frequencies in parallel task: per individual text. Letter frequencies for every text
+// Variant solution by counting letter frequencies in a task per individual text. Letter frequencies for every text
 // are summed afterwards
 let frequency' (texts: string list) =
 
