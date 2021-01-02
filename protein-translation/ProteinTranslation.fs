@@ -26,5 +26,5 @@ let proteins rna =
     rna
     |> Seq.chunkBySize 3
     |> Seq.map (fun codon -> codonProtein.[String codon])
-    |> Seq.takeWhile (fun protein -> protein <> "STOP")
+    |> Seq.takeWhile ((<>) "STOP")
     |> Seq.toList
