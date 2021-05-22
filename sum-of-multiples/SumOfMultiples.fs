@@ -3,10 +3,7 @@
 // function with smarter for / yield sequence and using collect
 let sum (numbers: int list) (upperBound: int) : int =
     let multiplesOf upperBound divisor =
-        seq {
-            for multiple in divisor .. divisor .. (upperBound - 1) do
-                yield multiple
-        }
+        seq { divisor .. divisor .. (upperBound - 1) }
 
     numbers
     |> Seq.filter (fun n -> n > 0)
