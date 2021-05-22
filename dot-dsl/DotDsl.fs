@@ -34,11 +34,7 @@ let isEdge =
     | Edge _ -> true
     | _ -> false
 
-let attrs graph =
-    graph |> List.filter isAttr |> List.sort
-
-let nodes graph =
-    graph |> List.filter isNode |> List.sort
-
-let edges graph =
-    graph |> List.filter isEdge |> List.sort
+let extract pred graph = graph |> List.filter pred |> List.sort
+let attrs graph = extract isAttr graph
+let nodes graph = extract isNode graph
+let edges graph = extract isEdge graph
