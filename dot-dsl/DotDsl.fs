@@ -19,26 +19,26 @@ let node key attrs = Node(key, attrs)
 
 let edge left right attrs = Edge(left, right, attrs)
 
+let isAttr =
+    function
+    | Attribute _ -> true
+    | _ -> false
+
+let isNode =
+    function
+    | Node _ -> true
+    | _ -> false
+
+let isEdge =
+    function
+    | Edge _ -> true
+    | _ -> false
+
 let attrs graph =
-    graph
-    |> List.filter
-        (function
-        | Attribute _ -> true
-        | _ -> false)
-    |> List.sort
+    graph |> List.filter isAttr |> List.sort
 
 let nodes graph =
-    graph
-    |> List.filter
-        (function
-        | Node _ -> true
-        | _ -> false)
-    |> List.sort
+    graph |> List.filter isNode |> List.sort
 
 let edges graph =
-    graph
-    |> List.filter
-        (function
-        | Edge _ -> true
-        | _ -> false)
-    |> List.sort
+    graph |> List.filter isEdge |> List.sort
