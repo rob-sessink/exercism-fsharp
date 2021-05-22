@@ -1,5 +1,19 @@
 ﻿module SumOfMultiples
 
+// function with smarter for / yield sequence and using collect
+let sum (numbers: int list) (upperBound: int) : int =
+    let multiplesOf upperBound divisor =
+        seq {
+            for multiple in divisor .. divisor .. (upperBound - 1) do
+                yield multiple
+        }
+
+    numbers
+    |> Seq.filter (fun n -> n > 0)
+    |> Seq.collect (multiplesOf upperBound)
+    |> Seq.distinct
+    |> Seq.sum
+
 // function using seq, yield and Option module to derive multiplesOf
 let sum2 (numbers: int list) (upperBound: int) : int =
     let isMultipleOf dividend divisor =
@@ -12,13 +26,12 @@ let sum2 (numbers: int list) (upperBound: int) : int =
         }
 
     numbers
-    |> Seq.map (multiplesOf upperBound)
-    |> Seq.concat
+    |> Seq.collect (multiplesOf upperBound)
     |> Seq.distinct
     |> Seq.sum
 
 // function using purely Seq module members: choose, unfold to derive multiplesOf
-let sum (numbers: int list) (upperBound: int) : int =
+let sum3 (numbers: int list) (upperBound: int) : int =
     let isMultipleOf dividend divisor =
         if divisor <> 0 && dividend % divisor = 0 then Some dividend else None
 
@@ -31,7 +44,6 @@ let sum (numbers: int list) (upperBound: int) : int =
         |> Seq.choose (fun dividend -> isMultipleOf dividend divisor)
 
     numbers
-    |> Seq.map (multiplesOf upperBound)
-    |> Seq.concat
+    |> Seq.collect (multiplesOf upperBound)
     |> Seq.distinct
     |> Seq.sum
