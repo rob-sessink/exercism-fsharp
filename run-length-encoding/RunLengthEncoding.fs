@@ -22,11 +22,10 @@ let encode (input: string) =
         | [] -> [ (1, curr) ]
 
     let encoded =
-        ([], (Seq.toList input))
-        ||> List.fold (fun encoded curr -> (encodePoint curr encoded))
+        ([], input)
+        ||> Seq.fold (fun encoded curr -> (encodePoint curr encoded))
 
-    (encoded, "")
-    ||> List.foldBack (fun curr s -> s + pack curr)
+    (encoded, "") ||> Seq.foldBack (fun curr s -> s + pack curr)
 
 let decode input =
     let unpack entry =
@@ -50,8 +49,8 @@ let decode input =
         | [] -> (decodeAppend curr ("", None) decoded)
 
     let decoded =
-        ([], (Seq.toList input))
-        ||> List.fold (fun decoded curr -> (decodePoint curr decoded))
+        ([], input)
+        ||> Seq.fold (fun decoded curr -> (decodePoint curr decoded))
 
     (decoded, "")
-    ||> List.foldBack (fun curr s -> s + unpack curr)
+    ||> Seq.foldBack (fun curr s -> s + unpack curr)
