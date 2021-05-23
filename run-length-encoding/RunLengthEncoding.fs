@@ -29,37 +29,26 @@ let encode (input: string) =
     (encoded, "")
     ||> List.foldBack (fun curr s -> s + pack curr)
 
-
-let isDigit c = Char.IsDigit(c)
-let emptyPoint t = (snd t = "")
-let hasPoint t = (snd t <> "")
-let emptyCount t = (fst t = "")
-
 let decode input =
     let unpack entry =
-        let c = int (fst entry)
-        [ for _ in 1 .. c -> (snd entry) ] |> String.Concat
+        let c = (fst entry) |> int
 
-    let isContinuedNumber point prev = isDigit point && emptyPoint prev
-
-    let isStartPoint point prev = isDigit point && hasPoint prev
-
-    let isSinglePoint point prev = isDigit point = false && hasPoint prev
-
-    let isFirstSinglePoint point prev =
-        isDigit point = false && emptyCount prev && emptyPoint prev
+        match (snd entry) with
+        | None -> ""
+        | Some p -> String.replicate c (string p)
 
     let decodePoint curr decoded =
         let decodeAppend curr prev decoded =
-            if isContinuedNumber curr prev then (string (fst prev) + string curr, "") :: decoded
-            else if isStartPoint curr prev then (string curr, "") :: decoded
-            else if isSinglePoint curr prev then ("1", string curr) :: decoded
-            else if isFirstSinglePoint curr prev then ("1", string curr) :: decoded
-            else replaceHead (fst prev, string curr) decoded
+            match Char.IsDigit(curr), snd prev, fst prev with
+            | true, None, _ -> (fst prev + string curr, None) :: decoded
+            | true, Some _, _ -> (string curr, None) :: decoded
+            | false, Some _, _ -> ("1", Some curr) :: decoded
+            | false, None, "" -> ("1", Some curr) :: decoded
+            | _ -> replaceHead (fst prev, Some curr) decoded
 
         match decoded with
         | prev :: _ -> (decodeAppend curr prev decoded)
-        | [] -> (decodeAppend curr ("", "") decoded)
+        | [] -> (decodeAppend curr ("", None) decoded)
 
     let decoded =
         ([], (Seq.toList input))
