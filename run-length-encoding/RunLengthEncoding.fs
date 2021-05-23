@@ -8,7 +8,6 @@ let replaceHead newHead list =
     | [] -> [ newHead ]
 
 let encode (input: string) =
-
     let pack entry =
         match fst entry, snd entry with
         | c, p when c = 1 -> string p
@@ -31,9 +30,9 @@ let encode (input: string) =
 
 let decode input =
     let unpack entry =
-        let c = (fst entry) |> int
+        let c = fst entry |> int
 
-        match (snd entry) with
+        match snd entry with
         | None -> ""
         | Some p -> String.replicate c (string p)
 
