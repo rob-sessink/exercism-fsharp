@@ -2,11 +2,6 @@
 
 open System
 
-let replaceHead newHead list =
-    match list with
-    | _ :: tail -> newHead :: tail
-    | [] -> [ newHead ]
-
 let encode (input: string) =
     let pack entry =
         match fst entry, snd entry with
@@ -14,11 +9,11 @@ let encode (input: string) =
         | c, p -> string c + string p
 
     let encodePoint curr encoded =
-        let encodeAppend curr prev encoded =
-            if curr <> snd prev then (1, curr) :: encoded else replaceHead (fst prev + 1, curr) encoded
+        let encodeAppend curr prev encoded tail =
+            if curr <> snd prev then (1, curr) :: encoded else (fst prev + 1, curr) :: tail
 
         match encoded with
-        | prev :: _ -> (encodeAppend curr prev encoded)
+        | prev :: tail -> (encodeAppend curr prev encoded tail)
         | [] -> [ (1, curr) ]
 
     let encoded =
@@ -36,17 +31,17 @@ let decode input =
         | Some p -> String.replicate c (string p)
 
     let decodePoint curr decoded =
-        let decodeAppend curr prev decoded =
+        let decodeAppend curr prev decoded tail =
             match Char.IsDigit(curr), snd prev, fst prev with
             | true, None, _ -> (fst prev + string curr, None) :: decoded // continued digit
             | true, Some _, _ -> (string curr, None) :: decoded // new digit
             | false, Some _, _ -> ("1", Some curr) :: decoded // single point
             | false, None, "" -> ("1", Some curr) :: decoded // first single point
-            | _ -> replaceHead (fst prev, Some curr) decoded // point after digit
+            | _ -> (fst prev, Some curr) :: tail // point after digit
 
         match decoded with
-        | prev :: _ -> (decodeAppend curr prev decoded)
-        | [] -> (decodeAppend curr ("", None) decoded)
+        | prev :: tail -> (decodeAppend curr prev decoded tail)
+        | [] -> (decodeAppend curr ("", None) decoded [])
 
     let decoded =
         ([], input)
