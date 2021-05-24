@@ -38,11 +38,11 @@ let decode input =
     let decodePoint curr decoded =
         let decodeAppend curr prev decoded =
             match Char.IsDigit(curr), snd prev, fst prev with
-            | true, None, _ -> (fst prev + string curr, None) :: decoded
-            | true, Some _, _ -> (string curr, None) :: decoded
-            | false, Some _, _ -> ("1", Some curr) :: decoded
-            | false, None, "" -> ("1", Some curr) :: decoded
-            | _ -> replaceHead (fst prev, Some curr) decoded
+            | true, None, _ -> (fst prev + string curr, None) :: decoded // continued digit
+            | true, Some _, _ -> (string curr, None) :: decoded // new digit
+            | false, Some _, _ -> ("1", Some curr) :: decoded // single point
+            | false, None, "" -> ("1", Some curr) :: decoded // first single point
+            | _ -> replaceHead (fst prev, Some curr) decoded // point after digit
 
         match decoded with
         | prev :: _ -> (decodeAppend curr prev decoded)
@@ -52,5 +52,4 @@ let decode input =
         ([], input)
         ||> Seq.fold (fun decoded curr -> (decodePoint curr decoded))
 
-    (decoded, "")
-    ||> Seq.foldBack (fun curr s -> s + unpack curr)
+    (decoded, "") ||> Seq.foldBack (fun curr s -> s + unpack curr)
