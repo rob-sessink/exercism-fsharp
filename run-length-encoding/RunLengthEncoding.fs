@@ -24,11 +24,9 @@ let encode (input: string) =
 
 let decode input =
     let unpack entry =
-        let c = fst entry |> int
-
-        match snd entry with
-        | None -> ""
-        | Some p -> String.replicate c (string p)
+        match entry with
+        | c, Some p -> String.replicate (int c) (string p)
+        | _, None -> ""
 
     let decodePoint curr decoded =
         let decodeAppend curr prev decoded tail =
