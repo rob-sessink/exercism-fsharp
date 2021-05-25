@@ -13,4 +13,4 @@ let score word =
         |> List.concat
         |> Map.ofList
 
-    Seq.fold (fun s c -> values.[System.Char.ToUpper(c)] + s) 0 word
+    Seq.sumBy (fun c -> values.[System.Char.ToUpper(c)]) word
