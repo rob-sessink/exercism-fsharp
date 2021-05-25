@@ -9,10 +9,8 @@ let score word =
             ['F', 4; 'H', 4; 'V', 4; 'W', 4; 'Y', 4]
             ['K', 5]
             ['J', 8; 'X', 8]
-            ['Q', 10; 'Z', 10]
-        ]
+            ['Q', 10; 'Z', 10]]
         |> List.concat
         |> Map.ofList
 
-    word
-    |> Seq.fold (fun s c -> values.[System.Char.ToUpper(c)] + s) 0
+    Seq.fold (fun s c -> values.[System.Char.ToUpper(c)] + s) 0 word
