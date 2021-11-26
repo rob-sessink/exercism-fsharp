@@ -105,26 +105,28 @@ type PlayerHand =
 
     /// get cards matching value
     member private this.ByValue(value: CardValue) =
-        this.Cards |> List.filter (fun c -> c.Value = value)
+        this.Cards
+        |> List.filter (fun c -> c.Value = value)
 
     /// get cards matching suit
     member private this.BySuit(suit: CardSuit) =
         this.Cards |> List.filter (fun c -> c.Suit = suit)
 
-    /// get value for which 'x' cards have an equal value
+    /// get highest card
+    member this.HighCard =
+        this.Cards |> List.maxBy (fun c -> c.Value)
+
+    /// get CardValues for which 'x' cards have an equal value
     member this.EqualValues number =
         this.Cards
         |> List.countBy (fun c -> c.Value)
         |> List.filter (fun (_, count) -> count = number)
 
-    /// get value for which 'x' cards have an equal suit
+    /// get CardSuits for which 'x' cards have an equal suit
     member this.EqualSuits number =
         this.Cards
         |> List.countBy (fun c -> c.Suit)
         |> List.filter (fun (_, count) -> count = number)
-
-    /// get highest card
-    member this.HighCard = this.Cards |> List.maxBy (fun c -> c.Value)
 
     /// determine if cards are sequential
     member this.Sequential =
@@ -153,17 +155,21 @@ type PlayerHand =
         | c when c.Length = matches -> this.extractCards matches this.BySuit c
         | _ -> None
 
-    /// if the hand contains an Ace, return cards with the ace is replaced as one, otherwise original cards are returned
+    /// if the hand contains an Ace, return cards with the Ace replaced as One otherwise original cards are returned
     member this.ProjectAceAsOne =
         this.Cards
-        |> List.map (fun (c: Card) -> if c.Value.Rank <> Value.Ace then c else { c with Value = CardValue.Create("1") })
+        |> List.map
+            (fun (c: Card) ->
+                if c.Value.Rank <> Value.Ace then
+                    c
+                else
+                    { c with Value = CardValue.Create("1") })
         |> this.Create
 
     member this.ToString =
         this.Cards
         |> List.map (fun c -> c.ToString)
         |> String.concat " "
-
 
 type RankedHand =
     { PokerHand: PokerHand
@@ -186,7 +192,8 @@ type RankedHand =
 
     /// sort cards top to bottom
     member private this.sortByValue(cards: Card list) =
-        cards |> List.sortByDescending (fun c -> c.Value.Rank)
+        cards
+        |> List.sortByDescending (fun c -> c.Value.Rank)
 
     /// compare by highest card; used as a tie breaker for equal poker hands or ranks
     member private this.CompareCardsByValue(x, y) =
@@ -214,20 +221,21 @@ type RankedHand =
         | Some 1 -> [ this ]
         | Some -1 -> [ other ]
         | None -> [ other; this ]
-        | i -> invalidArg "compare cards" $"Unknown comparison outcome: {i}"
+        | i -> invalidArg "compare rank or remaining" $"Unknown comparison outcome: {i}"
 
     member this.CompareWith(other) =
         match this, other with
         | x, y when x.PokerHand > y.PokerHand -> [ x ]
         | x, y when x.PokerHand < y.PokerHand -> [ y ]
         | x, y when x.PokerHand = y.PokerHand -> this.CompareByRankOrRemaining(y)
-        | i -> invalidArg "compare cards" $"Unknown comparison outcome: {i}"
-
-
+        | i -> invalidArg "compare hand" $"Unknown comparison outcome: {i}"
 
 /// Active Patterns used in ranking a PokerHand
 let (|HasValue|_|) (value: CardValue) (card: Card) =
-    if value.Rank = card.Value.Rank then Some card else None
+    if value.Rank = card.Value.Rank then
+        Some card
+    else
+        None
 
 let (|HighCardAce|_|) (hand: PlayerHand) =
     let Ace = CardValue.Create "A"
@@ -253,7 +261,7 @@ let rec (|Straight|_|) (hand: PlayerHand) =
     match hand with
     | h when hand.Sequential && h.Cards.Length = 5 -> Some h.Cards
     | HighCardAce _ ->
-        // if hand contains an ace, project the ace(s) as one and recursively match for a straight
+        // if hand contains an Ace, project the Ace(s) as One and recursively match for a straight
         match hand.ProjectAceAsOne with
         | Straight h -> Some h
         | _ -> None
@@ -280,7 +288,15 @@ let (|RoyalFlush|_|) (hand: PlayerHand) =
 type Round =
     { PlayerHands: PlayerHand list }
 
-    member this.RankHand(playerHand) =
+    static member Create(hands: string list) =
+        let playerHands =
+            hands
+            |> List.map (fun hand -> hand.Split ' ')
+            |> List.map (fun card -> card |> Seq.toList |> PlayerHand.Create)
+
+        { PlayerHands = playerHands }
+
+    member private this.RankHand(playerHand) =
         let pokerHand, rankedCards =
             match playerHand with
             | RoyalFlush cards -> RoyalFlush, cards
@@ -297,16 +313,9 @@ type Round =
 
         RankedHand.Create(pokerHand, rankedCards, playerHand)
 
-    static member Create(hands: string list) =
-        let playerHands =
-            hands
-            |> List.map (fun hand -> hand.Split ' ')
-            |> List.map (fun cardA -> cardA |> Seq.toList |> PlayerHand.Create)
-
-        { PlayerHands = playerHands }
-
     member this.Winners =
-        let rankedHands = this.PlayerHands |> List.map this.RankHand
+        let rankedHands =
+            this.PlayerHands |> List.map this.RankHand
 
         ([], rankedHands)
         ||> List.fold
