@@ -18,7 +18,7 @@ let ciphertext (input: String) =
         | i when i < 0 || i = 0 -> s
         | _ -> failwith $"Incorrect dimensions, chunk is too long: {s}"
 
-    let buildSquare n =
+    let encode n =
         let dims = dimension (Seq.length n)
 
         n
@@ -26,9 +26,8 @@ let ciphertext (input: String) =
         |> Seq.map (fun s -> pad s (snd dims))
         |> Seq.transpose
         |> Seq.map String.Concat
-        |> Seq.toArray
         |> String.concat " "
 
     match normalize input with
     | i when Seq.length i = 0 -> ""
-    | i -> buildSquare i
+    | i -> encode i
