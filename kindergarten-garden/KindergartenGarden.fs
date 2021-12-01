@@ -30,15 +30,14 @@ let students =
 
 let plants (diagram: string) student =
 
-    let ordinal student =
+    let ordinal (student: string) =
         List.findIndex (fun x -> x = student) students
 
-    let getPair (window: string) =
-        window.Substring((ordinal student) * 2, 2)
+    let getPair ord (window: string) = window.Substring(ord * 2, 2)
 
     let toPlants pair = pair |> Seq.map Plant.Create
 
     diagram.Split "\n"
-    |> Seq.map getPair
+    |> Seq.map (getPair (ordinal student))
     |> Seq.collect toPlants
     |> Seq.toList
